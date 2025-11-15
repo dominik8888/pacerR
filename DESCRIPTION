@@ -1,0 +1,32 @@
+Package: pacerR
+Type: Package
+Title: Automated Retrieval and Network Analysis of PACER Court Documents
+Version: 0.1.0
+Authors@R: person("Sacha", "Bechara", 
+                  email = "sacha.bechara.23@ucl.ac.uk", 
+                  role = c("aut", "cre"))
+Description: Provides tools for authenticated access to the PACER (Public Access 
+    to Court Electronic Records) system, automated retrieval of case dockets in XML 
+    format, and discovery of associated case networks. Designed for academic and 
+    computational legal research. Users are responsible for understanding PACER fees 
+    and obtaining appropriate fee exemptions. This tool was developed for research 
+    on litigation in US federal courts and includes responsible rate-limiting.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.3
+Imports:
+    httr,
+    rvest,
+    jsonlite,
+    xml2,
+    dplyr,
+    readr,
+    purrr
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+URL: https://github.com/sachabechara/pacerR
+BugReports: https://github.com/sachabechara/pacerR/issues

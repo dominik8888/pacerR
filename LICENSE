@@ -1,0 +1,59 @@
+MIT License
+
+Copyright (c) 2024 Sacha Bechara
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+CRITICAL DISCLAIMER - PACER FEES AND RESPONSIBILITIES:
+
+PACER charges fees for document access. Users of this software are SOLELY 
+responsible for:
+- Understanding PACER's fee structure ($0.10 per page, capped at $30/quarter)
+- Obtaining and verifying fee exemptions if applicable
+- Ensuring fee exemptions are properly applied to their account
+- Monitoring their PACER account for charges
+- All costs incurred through use of this software
+
+This software was developed for academic research on litigation in US federal 
+courts. It has been tested primarily on US Courts of Appeals and may behave 
+differently on other court types (District Courts, Bankruptcy Courts, etc.).
+
+THE AUTHOR IS NOT RESPONSIBLE FOR:
+- Any fees or charges incurred through use of this software
+- Verification of fee exemption status
+- Changes to PACER's fee structure or policies
+- Misuse or violations of PACER Terms of Service
+- Use of this software without proper fee exemption verification
+
+This software is intended ONLY for legitimate academic research purposes.
+Bulk downloading for commercial purposes, resale, or non-research uses is
+prohibited and violates PACER's Acceptable Use Policy.
+
+Users MUST:
+- Read and comply with PACER Terms of Service and Acceptable Use Policy
+- Understand their account's fee exemption status BEFORE using this software
+- Verify fee exemption is active and applies to their intended use
+- Monitor their PACER account for any unexpected charges
+- Respect rate limits and court system resources
+- Use only for legitimate research purposes
+
+For fee exemption information, see:
+https://pacer.uscourts.gov/my-account-billing/billing/fee-exemption-request-researchers

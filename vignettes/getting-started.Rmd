@@ -1,0 +1,383 @@
+---
+title: "Getting Started with pacerR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with pacerR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Introduction
+
+`pacerR` provides tools for automated retrieval and network analysis of PACER (Public Access to Court Electronic Records) court documents. This vignette walks through common use cases for computational legal research.
+
+## ⚠️ CRITICAL: Fee Information
+
+**PACER charges $0.10 per page unless you have an active fee exemption.**
+
+Before using this package:
+1. **Apply for fee exemption**: https://pacer.uscourts.gov/my-account-billing/billing/fee-exemption-request-researchers
+2. **Verify exemption is ACTIVE** in your PACER account
+3. **Confirm exemption applies** to the courts you're accessing  
+4. **Monitor your account** regularly for charges
+
+**You are SOLELY responsible for all fees. The author is NOT liable for charges to your account.**
+
+This tool was tested with a research fee exemption on US Courts of Appeals. It may behave differently on District Courts or other court types.
+
+## Installation
+
+```{r}
+# Install from GitHub
+devtools::install_github("sachabechara/pacerR")
+```
+
+## Setup
+
+### PACER Account
+
+You need a PACER account to use this package. Register at https://pacer.uscourts.gov/
+
+**Fee exemption**: Apply for research fee exemption at https://pacer.uscourts.gov/my-account-billing/billing/fee-exemption-request-researchers
+
+**Verify exemption**: Log into your PACER account and confirm the exemption is active before using this tool.
+
+### Credentials
+
+Store your credentials securely using environment variables:
+
+```{r}
+# Edit your .Renviron file
+usethis::edit_r_environ()
+```
+
+Add these lines to your `.Renviron`:
+
+```
+PACER_USERNAME=your_username
+PACER_PASSWORD=your_password
+```
+
+Restart R for changes to take effect.
+
+## Basic Workflow
+
+### 1. Load Package and Authenticate
+
+```{r}
+library(pacerR)
+
+# Authenticate (automatically reads from environment variables)
+token <- pacer_authenticate()
+```
+
+### 2. Retrieve Case Dockets
+
+#### Individual Cases
+
+```{r}
+# Retrieve a few specific cases
+results <- pacer_retrieve_cases(
+  cases = c("20-1234", "20-1235", "20-1236"),
+  circuit = "cadc",  # DC Circuit
+  auth_token = token
+)
+
+# Check results
+table(results$status)
+```
+
+#### From CSV File
+
+Suppose you have a CSV file with case numbers:
+
+```{r}
+# Read cases from CSV
+results <- pacer_retrieve_cases(
+  cases = "my_cases.csv",
+  case_column = "case_number",  # Column with case numbers
+  circuit = "cadc",
+  auth_token = token
+)
+```
+
+#### Custom Options
+
+```{r}
+# Custom rate limiting and output directory
+results <- pacer_retrieve_cases(
+  cases = my_cases,
+  circuit = "cadc",
+  output_dir = "data/xml_files",
+  rate_limit_seconds = c(8, 12),  # Random wait 8-12 seconds
+  save_progress = 25,              # Save progress every 25 cases
+  auth_token = token
+)
+```
+
+### 3. Extract Associated Cases
+
+Once you have XML files, extract case associations:
+
+```{r}
+# Single file
+associations <- pacer_extract_associations("pacer_xml_output/docket_20_1234.xml")
+
+# Multiple files
+library(purrr)
+xml_files <- list.files("pacer_xml_output", 
+                       pattern = "\\.xml$", 
+                       full.names = TRUE)
+all_associations <- map_dfr(xml_files, pacer_extract_associations)
+
+# View results
+head(all_associations)
+```
+
+### 4. Network Discovery
+
+Find complete litigation networks:
+
+```{r}
+# Simple discovery (immediate associations only)
+network <- pacer_discover_network(
+  cases = c("20-1234", "20-1235"),
+  circuit = "cadc",
+  auth_token = token
+)
+
+# What did we find?
+cat("Original cases:", length(network$original_cases), "\n")
+cat("New cases discovered:", length(network$discovered_cases), "\n")
+cat("Total network size:", length(network$all_unique_cases), "\n")
+```
+
+#### Recursive Discovery
+
+Find second-degree connections:
+
+```{r}
+# Recursive mode: retrieve XML for newly discovered cases
+network <- pacer_discover_network(
+  cases = "climate_cases.csv",
+  case_column = "case_number",
+  circuit = "cadc",
+  recursive = TRUE,
+  max_iterations = 2,  # How many levels deep
+  auth_token = token
+)
+
+# Access results
+View(network$associations)
+View(network$discovered_cases)
+```
+
+## Example: Climate Litigation Network
+
+Here's a complete workflow for analyzing climate litigation:
+
+```{r}
+library(pacerR)
+library(dplyr)
+library(igraph)
+
+# 1. Authenticate
+token <- pacer_authenticate()
+
+# 2. Load initial case list
+climate_cases <- read.csv("climate_litigation_cases.csv")
+
+# 3. Discover complete network
+network <- pacer_discover_network(
+  cases = "climate_litigation_cases.csv",
+  case_column = "pacer_case_number",
+  circuit = "cadc",
+  recursive = TRUE,
+  max_iterations = 2,
+  output_dir = "climate_network",
+  auth_token = token
+)
+
+# 4. Analyze network structure
+associations <- network$associations %>%
+  filter(!is.na(associatedCase))
+
+# Create igraph object
+g <- graph_from_data_frame(
+  d = associations[, c("mainCase", "associatedCase")],
+  directed = FALSE
+)
+
+# Network metrics
+cat("Network density:", edge_density(g), "\n")
+cat("Number of components:", components(g)$no, "\n")
+cat("Average degree:", mean(degree(g)), "\n")
+
+# Identify central cases
+centrality <- data.frame(
+  case = V(g)$name,
+  degree = degree(g),
+  betweenness = betweenness(g)
+) %>%
+  arrange(desc(degree))
+
+head(centrality, 10)
+```
+
+## Understanding Association Types
+
+PACER tracks several types of case associations:
+
+```{r}
+# Summarize association types
+associations %>%
+  count(associationType, sort = TRUE)
+```
+
+Common types include:
+- **consolidated**: Cases merged for joint handling
+- **related**: Substantively connected cases
+- **lead case**: Primary case in consolidated group
+- **member case**: Part of consolidated group
+
+## Tips and Best Practices
+
+### Rate Limiting
+
+Be respectful of court servers:
+
+```{r}
+# Good: Reasonable wait times
+pacer_retrieve_cases(
+  cases = my_cases,
+  rate_limit_seconds = c(5, 10),  # 5-10 second random wait
+  ...
+)
+
+# Avoid: Too aggressive
+pacer_retrieve_cases(
+  cases = my_cases,
+  rate_limit_seconds = 1,  # Too fast
+  ...
+)
+```
+
+### Resume Interrupted Downloads
+
+If your download is interrupted:
+
+```{r}
+# Just re-run the same command
+# It will skip cases where XML already exists
+results <- pacer_retrieve_cases(
+  cases = "my_cases.csv",
+  case_column = "case_number",
+  output_dir = "pacer_xml_output",  # Same directory
+  resume_if_exists = TRUE,          # Default behavior
+  ...
+)
+```
+
+### Monitor Costs
+
+**With fee exemption**: Should be $0, but VERIFY exemption is applied
+
+**Without fee exemption**: PACER charges $0.10 per page (capped at $30/quarter)
+
+```{r}
+# Track your retrievals
+results %>%
+  count(status)
+
+# Successful retrievals may incur charges if no exemption
+successful_downloads <- sum(results$status == "SUCCESS")
+cat("Successfully retrieved:", successful_downloads, "cases\n")
+
+# WITHOUT EXEMPTION, estimated cost:
+cat("Estimated cost without exemption: ~$", successful_downloads * 0.10, "\n")
+cat("(This is an approximation - actual costs vary by docket size)\n")
+```
+
+**Monitor your PACER account regularly**: https://pacer.uscourts.gov/
+
+**The author is not responsible for any charges to your account.**
+
+### Error Handling
+
+Check logs for failed retrievals:
+
+```{r}
+# Review failures
+failures <- results %>%
+  filter(status != "SUCCESS")
+
+# Common failure reasons
+table(failures$status)
+
+# Retry failed cases
+failed_cases <- failures$caseNumber
+retry_results <- pacer_retrieve_cases(
+  cases = failed_cases,
+  ...
+)
+```
+
+## Going Further
+
+### Network Analysis
+
+Use retrieved data with network analysis packages:
+
+```{r}
+library(igraph)
+library(tidygraph)
+library(ggraph)
+
+# Create network graph
+g <- associations %>%
+  filter(!is.na(associatedCase)) %>%
+  as_tbl_graph(directed = FALSE)
+
+# Visualize
+ggraph(g, layout = 'fr') +
+  geom_edge_link(alpha = 0.3) +
+  geom_node_point(size = 3) +
+  theme_graph()
+```
+
+### Text Analysis
+
+Parse XML for docket entry text:
+
+```{r}
+library(xml2)
+
+# Read XML
+xml <- read_xml("pacer_xml_output/docket_20_1234.xml")
+
+# Extract docket entries
+entries <- xml_find_all(xml, ".//docketEntry")
+
+# Get text of entries
+entry_text <- xml_text(xml_find_all(entries, ".//docketEntryText"))
+```
+
+## Additional Resources
+
+- [PACER User Manual](https://pacer.uscourts.gov/)
+- Package documentation: `?pacer_retrieve_cases`
+- Issues/bugs: https://github.com/yourusername/pacerR/issues
+
+## Citation
+
+```{r}
+citation("pacerR")
+```
