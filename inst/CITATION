@@ -1,0 +1,16 @@
+citHeader("To cite pacerR in publications use:")
+
+bibentry(
+  bibtype  = "Manual",
+  title    = "pacerR: Automated Retrieval of Case Dockets and Documents from PACER CM/ECF System",
+  author   = "Sacha Bechara",
+  year     = "2025",
+  note     = "R package version 0.1.0",
+  url      = "https://github.com/sachabechara/pacerR",
+  textVersion = paste(
+    "Bechara, S. (2025).",
+    "pacerR: Automated Retrieval of Case Dockets and Documents from PACER CM/ECF System.",
+    "R package version 0.1.0.",
+    "https://github.com/sachabechara/pacerR"
+  )
+)

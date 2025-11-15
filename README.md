@@ -415,7 +415,6 @@ This software is provided AS-IS for academic research purposes with NO WARRANTIE
 ## Author
 
 **Sacha Bechara**  
-UCL Department of Political Science  
 Email: sacha.bechara.23@ucl.ac.uk (until end of 2026)  
 Alternative: sacha_bechara@aol.com
 
@@ -423,4 +422,4 @@ Developed as part of research on litigation networks in US federal courts.
 
 ## Acknowledgments
 
-This tool was developed independently for research purposes and is not affiliated with or endorsed by UCL, PACER, or the US Courts.
+This tool was developed independently for academic research on federal court litigation patterns. It is not affiliated with or endorsed by PACER or the US Courts.
